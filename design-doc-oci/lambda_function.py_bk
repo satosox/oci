@@ -1,0 +1,49 @@
+import json
+import boto3
+import os
+import oci
+from boto3.dynamodb.conditions import Key
+
+dynamodb = boto3.resource('dynamodb')
+
+def lambda_handler(event, context):
+    
+    try:
+        apitable = dynamodb.Table('apikey')
+        clientip = event["requestContext"]["identity"]["sourceIp"]
+        
+        val = apitable.query(KeyConditionExpression=Key('ip').eq(clientip))
+        pri_key = val["Items"][0]["pri"]
+        
+        path = '/tmp/pri_key.pem'
+        
+        with open(path, mode='w') as f:
+            f.write(pri_key)
+       
+        config = {
+            "user": "ocid1.user.oc1..aaaaaaaag4ff2agcj3msvje22fnrpwchyavemzfyzq3aroid7uu7pmpixjkq",
+            "key_file": path,
+            "fingerprint": "73:ea:8c:03:48:56:12:d8:2e:1d:4d:42:c3:1e:85:c0",
+            "tenancy": "ocid1.tenancy.oc1..aaaaaaaak5uewei27bdr2mrl37p4fhecmzvea6w27ubjz6mkd5vzs2nqgijq",
+            "region": "ap-tokyo-1"
+        }
+
+        ob_sto = oci.object_storage.ObjectStorageClient(config)
+
+        print(vars(ob_sto.list_buckets(namespace_name="ctcmsp",compartment_id="ocid1.compartment.oc1..aaaaaaaa2ivrjxmiweoxa2kj5iajtynuvebamm7djqzevp4viilzfzupkaga")))
+
+        return {
+            'statusCode': 200,
+            'body': json.dumps('Hello from Lambda!')
+        }
+        
+    except:
+        import traceback
+        traceback.print_exc()
+        
+        print("Error!")
+        
+        return {
+        'statusCode' : 500,
+        'body' : 'Error! Again.'
+    }
