@@ -1,8 +1,36 @@
+<!DOCTYPE html>
 <html>
-<h1>OCI 設計書作成ツール(仮)</h1>
+<meta charset="utf-8">
+<h1>Oracle Cloud 設計書作成ツール(仮)</h1>
 
+<h2>やり方</h2>
+<br>
+１、適当な読み取り専用の OCI ユーザを作る
+<br>
+２、適当なグループに所属させる
+<br>
+３、読み取り専用のポリシーを適用する<br>
+　　(例：ALLOW GROUP ReadOnly_Group to read all-resources in compartment ctc-yamada)
+<br>
+４、下のボタンを押して公開鍵を入手する<br>
+　　※鍵の有効時間は 1 時間なので注意！※
+<br>
 <form method=POST action="https://n0pqov9lla.execute-api.ap-northeast-1.amazonaws.com/default/create-oci-api-key">
 <input type="submit" value="Create API Key">
 </form>
-
+<br>
+５、OCI ユーザの「API キー」に生成した公開鍵を登録する<br>
+　　(フィンガープリントはメモしておく)
+<br>
+６、以下のそれぞれの値を調べて入力してボタンを押す
+<form method=POST action="https://dtma9c4cj7.execute-api.ap-northeast-1.amazonaws.com/default/create-oci-design">
+    User OCID:<input type="text" name="user"><br>
+    Tenancy OCID:<input type="text" name="tenancy"><br>
+    Fingerprint:<input type="text" name="finger"><br>
+    Compartment OCID:<input type="text" name="compartment"><br>
+    Namespace Name::<input type="text" name="namespace"><br>
+    region:<select name="region"><br>
+           <option>ap-tokyo-1</option>
+    <input type="submit" value="Create Design"><br>
+</form>
 </html>
