@@ -37,14 +37,30 @@ def lambda_handler(event, context):
             "region": region
         }
         
+        compute = oci.core.ComputeClient(config)
+        oci_compute = vars(compute.list_instances(compartment_id=compartment))
+        
+        result_compute = '<h2>Compute Instances</h2>'
+        
+        for i in range(len(oci_compute["data"])):
+            result_compute += oci_compute["data"][i].display_name + "<br>"
+        
         ob_sto = oci.object_storage.ObjectStorageClient(config)
         oci_ob = vars(ob_sto.list_buckets(namespace_name=namespace,compartment_id=compartment))
         
-        print(oci_ob["data"][0])
+        result_os = '<h2>ObjectStorage Buckets</h2>'
+        
+        for i in range(len(oci_ob["data"])):
+            result_os += oci_ob["data"][i].name + "<br>"
+        
+        result = result_compute + result_os
         
         return {
             'statusCode': 200,
-            'body': 'OK!'
+            'headers' : {
+                'content-type' : 'text/html'
+            },
+            'body' : result
         }
         
     except:
